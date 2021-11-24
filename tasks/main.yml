@@ -1,3 +1,9 @@
+#- name: check 
+#  shell: df -h
+#  when: 
+#    - ansible_hostname == "openslave"
+#  tags: [test]
+
 - name: Install epel yum repository
   yum: 
     name: epel-release 
@@ -35,6 +41,7 @@
     - mariadb-server
     - mariadb
     - vim
+    - sshpass
   tags: [install_dependencies]
 
 
@@ -48,12 +55,28 @@
   tags: [start_enable_mariadb]
 
 
+#- name: mysql_secure_installation Command Test
+#  expect:
+#      command: mysql_secure_installation
+#      responses:
+#        'Enter current password for root \(enter for none\):': "\n"
+#        'Switch to unix_socket authentication \[Y\/n\]' : "n"
+#        'Change the root password? \[Y\/n\]': 'y'
+#        'New password:': '123'
+#        'Re-enter new password:': '123'
+#        'Remove anonymous users\? \[Y\/n\]:': 'y'
+#        'Disallow root login remotely\? \[Y\/n\]:': 'y'
+#        'Remove test database and access to it\? \[Y\/n\]:': 'y'
+#        'Reload privilege tables now? [Y/n]:': 'y'
+#      echo: yes
+#  tags: [mysql_secure_installation]
+
+
 - name: Create a mysql DB
   mysql_db:
         login_user: root
         login_password: root@123
         login_host: localhost
-#        login_port:
         name: opennebula
         state: present
   tags: [create_db]
@@ -134,13 +157,6 @@
     state: reloaded
   tags: [reload_firewalld]
 
-#- name: Copy oneadmin user ssh config
-#  template: 
-#    src=oneadmin_ssh_config
-#    dest=/var/lib/one/.ssh/config
-#    owner=oneadmin
-#    mode=600
-
 - name: Enable and start services
   service: 
       name: "{{ item }}" 
@@ -150,6 +166,86 @@
     - opennebula
     - opennebula-sunstone
   tags: [start_enable_opennebula]
+
+
+################ KVM INSTALLATION ################
+
+- name: Install epel yum repository
+  yum:
+    name: epel-release
+    state: present
+  when:
+    - ansible_hostname == "kvm"
+  tags: [epel_install]
+
+- name: Add opennebula Repository
+  yum_repository:
+        name: opennebula
+        description: opennebula
+        baseurl: https://downloads.opennebula.org/repo/6.1/CentOS/7/x86_64
+        gpgcheck: yes
+        enabled: yes
+        gpgkey: https://downloads.opennebula.org/repo/repo.key
+  when:
+    - ansible_hostname == "kvm"
+  tags: [opennebula_install]
+
+- name: Install libselinux-python (required by ansible to manage selinux)
+  yum:
+    name: libselinux-python
+    state: present
+  when:
+    - ansible_hostname == "kvm"
+  tags: [disable_selinux]
+
+- name: disable selinux
+  selinux:
+     state: disabled
+  when:
+    - ansible_hostname == "kvm"
+  tags: [disable_selinux]
+
+- name: install required dependencies
+  yum:
+    name: opennebula-node-kvm
+    state: installed
+  when:
+    - ansible_hostname == "kvm"
+  tags: [install_dependencies]
+
+#- name: Copy public key to the nodes
+#  command: su oneadmin -l -c 'ssh-keygen -t rsa -N '''
+#  become_exe: sudo
+#  when:
+#    - ansible_hostname == "openslave"
+#  tags: [passwordless_ssh]
+
+- name: Create ssh-keyscan 
+  command: su oneadmin -l -c 'ssh-keyscan openslave kvm >> /var/lib/one/.ssh/known_hosts'
+  become_exe: sudo
+  when:
+     - ansible_hostname == "openslave"
+  tags: [passwordless_ssh]
+
+- name: Send to kvm server
+  command: su oneadmin -l -c 'sshpass -p "Bb@123" ssh-copy-id oneadmin@kvm'
+  when:
+     - ansible_hostname == "openslave"
+  tags: [passwordless_ssh]
+
+- name: Adding KVM Host
+  command: su oneadmin -l -c 'onehost create kvm -i kvm -v kvm'
+  become_exe: sudo
+  when:
+     - ansible_hostname == "openslave"
+  tags: [Add_KVM_Host]
+
+
+
+
+
+
+
 
 
 
