@@ -1,0 +1,64 @@
+- name: Install epel yum repository
+  yum:
+    name: epel-release
+    state: present
+  when:
+    - ansible_hostname == "kvm"
+  tags: [epel_install]
+
+- name: Add opennebula Repository
+  yum_repository:
+        name: opennebula
+        description: opennebula
+        baseurl: https://downloads.opennebula.org/repo/6.1/CentOS/7/x86_64
+        gpgcheck: yes
+        enabled: yes
+        gpgkey: https://downloads.opennebula.org/repo/repo.key
+  when:
+    - ansible_hostname == "kvm"
+  tags: [opennebula_install]
+
+- name: Install libselinux-python (required by ansible to manage selinux)
+  yum:
+    name: libselinux-python
+    state: present
+  when:
+    - ansible_hostname == "kvm"
+  tags: [disable_selinux]
+
+- name: disable selinux
+  selinux:
+     state: disabled
+  when:
+    - ansible_hostname == "kvm"
+  tags: [disable_selinux]
+
+- name: install required dependencies
+  yum:
+    name: opennebula-node-kvm
+    state: installed
+  when:
+    - ansible_hostname == "kvm"
+  tags: [install_dependencies]
+
+
+- name: Create ssh-keyscan
+  command: su oneadmin -l -c 'ssh-keyscan openmaster kvm >> /var/lib/one/.ssh/known_hosts'
+  become_exe: sudo
+  when:
+     - ansible_hostname == "openmaster"
+  tags: [passwordless_ssh]
+
+- name: Send to kvm server
+  command: su oneadmin -l -c 'sshpass -p "Bb@123" ssh-copy-id oneadmin@kvm'
+  when:
+     - ansible_hostname == "openmaster"
+  tags: [passwordless_ssh]
+
+- name: Adding KVM Host
+  command: su oneadmin -l -c 'onehost create kvm -i kvm -v kvm'
+  become_exe: sudo
+  when:
+     - ansible_hostname == "openmaster"
+  tags: [Add_KVM_Host]
+

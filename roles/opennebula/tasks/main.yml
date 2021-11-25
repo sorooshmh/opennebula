@@ -1,0 +1,187 @@
+# name: check 
+# shell: df -h
+# when: 
+#    - (ansible_hostname == "openslave")
+# tags: [test]
+
+- name: Install epel yum repository
+  yum: 
+    name: epel-release 
+    state: present
+  tags: [epel_install]
+
+- name: Add opennebula Repository
+  yum_repository:
+        name: opennebula
+        description: opennebula
+        baseurl: https://downloads.opennebula.org/repo/6.1/CentOS/7/x86_64
+        gpgcheck: yes
+        enabled: yes
+        gpgkey: https://downloads.opennebula.org/repo/repo.key
+  tags: [opennebula_install]
+
+
+- name: Install libselinux-python (required by ansible to manage selinux)
+  yum: 
+    name: libselinux-python 
+    state: present
+  tags: [install_dependencies_selinux]
+
+- name: disable selinux
+  selinux: 
+     state: disabled
+  tags: [disable_selinux]
+
+- name: install required dependencies
+  yum: 
+    name: "{{ item }}" 
+    state: installed
+  with_items:
+    - python3-pip
+    - python2-PyMySQL
+    - mariadb-server
+    - mariadb
+    - vim
+    - sshpass
+  tags: [install_dependencies]
+
+
+- name: Enable and start Maridb services
+  service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+  with_items:
+    - mariadb
+  tags: [start_enable_mariadb]
+
+- name: Stop MySQL
+  service: 
+     name: mariadb state=stopped
+  tags: [mariadb_root_pass]
+
+- name: set environment variables
+  shell: systemctl set-environment MYSQLD_OPTS="--skip-grant-tables"
+  tags: [mariadb_root_pass]
+
+- name: Start MySQL
+  service: 
+        name: mariadb 
+        state: started
+  tags: [mariadb_root_pass]
+
+#- name: sql query
+#  command: mysql -u root --execute="ALTER USER 'root'@'localhost' IDENTIFIED BY 'root@123';"
+#  tags: [change_mariadb_pass]
+
+- name: Stop MySQL
+  service: 
+     name: mariadb 
+     state: stopped
+  tags: [mariadb_root_pass]
+
+- name: unset environment variables
+  shell: systemctl unset-environment MYSQLD_OPTS
+  tags: [mariadb_root_pass]
+
+- name: Start MySQL
+  service: 
+    name: mysqld 
+    state: started
+  tags: [mariadb_root_pass]
+
+- name: Create a mysql DB
+  mysql_db:
+        login_user: root
+        login_password: root@123
+        login_host: localhost
+        name: opennebula
+        state: present
+  tags: [create_db]
+
+- name: Set mysql user privileges
+  mysql_user:
+    login_user: root
+    login_password: root@123
+    login_host: localhost
+    name: oneadmin
+    priv: "opennebula.*:ALL"
+    password: "Aa@123"
+    host: localhost
+    state: present
+  tags: [set_mysql_privileges]
+
+- name: install Opennebula server packages
+  yum: 
+    name: "{{ item }}" 
+    state: present
+  with_items:
+    - opennebula
+    - opennebula-server
+    - opennebula-sunstone
+    - opennebula-rubygems
+    - opennebula-java
+    - opennebula-gate
+    - opennebula-flow
+    - opennebula-node-kvm
+    - opennebula-common
+  tags: [install_opennebula]
+
+
+- name: Uncomment mysql line in oned
+  replace:
+        dest: /etc/one/oned.conf
+        after: '# Sample configuration for MySQL'
+        before: ']'
+        regexp: '^#?\s*{{ item.key }}\s'
+        replace: "{{ item.key }}"
+  with_items:
+  - key: DB  
+  - key: SERVER
+  - key: PORT
+  - key: USER
+  - key: PASSWD
+  - key: DB_NAME
+  - key: CONNECTIONS
+  - key: COMPARE_BINARY 
+  tags: [uncomment_mysqlline_in_oned]
+ 
+- name: Set PASSWD on oned
+  replace:
+    dest: /etc/one/oned.conf
+    after: '# Sample configuration for MySQL'
+    before: ']'
+    regexp: '^PASSWD =\s(.*)$'
+    replace: 'PASSWD = "Aa@123",'
+  tags: [setpassword_mysql_oned]
+
+- name: Set Password to oneadmin user
+  shell: echo "oneadmin:Bb@123" > /var/lib/one/.one/one_auth
+  tags: [setpassword_oned]
+
+- name: Add port to firewalld
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  with_items:
+    - 9869/tcp
+  tags: [addport_to_firewalld]
+
+- name: reload service firewalld
+  systemd:
+    name: firewalld
+    state: reloaded
+  tags: [reload_firewalld]
+
+- name: Enable and start services
+  service: 
+      name: "{{ item }}" 
+      state: started 
+      enabled: yes
+  with_items:
+    - opennebula
+    - opennebula-sunstone
+  tags: [start_enable_opennebula]
+
+

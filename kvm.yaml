@@ -1,0 +1,8 @@
+---
+ - hosts:
+     - opennebula-servers 
+     - kvm_servers
+
+   roles:
+    - kvm
+

@@ -1,0 +1,6 @@
+---
+ - hosts: 
+      - opennebula-servers
+
+   roles:
+    - opennebula
