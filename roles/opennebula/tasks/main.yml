@@ -20,6 +20,17 @@
         gpgkey: https://downloads.opennebula.org/repo/repo.key
   tags: [opennebula_install]
 
+- name: Add Mariadb Repository
+  yum_repository:
+        name: mariadb
+        description: mariadb
+        baseurl: http://yum.mariadb.org/10.3/centos7-amd64
+        gpgcheck: yes
+        enabled: yes
+        gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+  tags: [mariadb_install]
+
+
 
 - name: Install libselinux-python (required by ansible to manage selinux)
   yum: 
@@ -126,6 +137,25 @@
     - opennebula-node-kvm
     - opennebula-common
   tags: [install_opennebula]
+
+- name: Comment sqlite
+  replace:
+        dest: /etc/one/oned.conf
+        after: '# Sample configuration for MySQL'
+        before: ']'
+        regexp: '^#?\s*{{ item.key }}\s'
+        replace: "{{ item.key }}"
+  with_items:
+  - key: DB
+  - key: SERVER
+  - key: PORT
+  - key: USER
+  - key: PASSWD
+  - key: DB_NAME
+  - key: CONNECTIONS
+  - key: COMPARE_BINARY
+  tags: [uncomment_mysqlline_in_oned]
+
 
 
 - name: Uncomment mysql line in oned
