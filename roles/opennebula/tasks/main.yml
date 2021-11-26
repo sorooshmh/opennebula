@@ -70,9 +70,9 @@
         state: started
   tags: [mariadb_root_pass]
 
-#- name: sql query
-#  command: mysql -u root --execute="ALTER USER 'root'@'localhost' IDENTIFIED BY 'root@123';"
-#  tags: [change_mariadb_pass]
+- name: sql query
+  command: mysql -u root --execute="ALTER USER 'root'@'localhost' IDENTIFIED BY 'root@123';"
+  tags: [change_mariadb_pass]
 
 - name: Stop MySQL
   service: 
