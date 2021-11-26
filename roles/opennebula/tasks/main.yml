@@ -1,8 +1,8 @@
-# name: check 
-# shell: df -h
+#- name: check 
+#  shell: df -h
 # when: 
 #    - (ansible_hostname == "openslave")
-# tags: [test]
+#  tags: [test]
 
 - name: Install epel yum repository
   yum: 
@@ -14,7 +14,7 @@
   yum_repository:
         name: opennebula
         description: opennebula
-        baseurl: https://downloads.opennebula.org/repo/6.1/CentOS/7/x86_64
+        baseurl: https://downloads.opennebula.io/repo/6.2.0/CentOS/7/x86_64/
         gpgcheck: yes
         enabled: yes
         gpgkey: https://downloads.opennebula.org/repo/repo.key
@@ -183,5 +183,37 @@
     - opennebula
     - opennebula-sunstone
   tags: [start_enable_opennebula]
+
+- name: change password
+  ansible.builtin.user:
+    name: "oneadmin"
+    state: present
+    password: "{{oneadmin_pass}}"
+    update_password: always
+  tags: [set_password] 
+
+- name: Create ssh-keyscan
+  command: su oneadmin -l -c 'ssh-keyscan openmaster openslave >> /var/lib/one/.ssh/known_hosts'
+  become_exe: sudo
+  when:
+     - ansible_hostname == "openmaster"
+  tags: [passwordless_ssh]
+
+- name: send sshkey from master to slave
+  command: su oneadmin -l -c 'sshpass -p "Bb@123" ssh-copy-id oneadmin@openslave'
+  when:
+     - ansible_hostname == "openmaster"
+  tags: [send_ssh_key_to_slave]
+
+
+- name: send sshkey from slave to master
+  command: su oneadmin -l -c 'sshpass -p "Bb@123" ssh-copy-id oneadmin@openmaster'
+  when:
+     - ansible_hostname == "openslave"
+  tags: [send_ssh_key_to_master]
+
+
+
+
 
 

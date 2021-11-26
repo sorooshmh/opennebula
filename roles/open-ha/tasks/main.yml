@@ -13,11 +13,11 @@
 - name: Set SERVER_ID  on oned
   replace:
     dest: /etc/one/oned.conf
-    regexp: 'SERVER_ID'
-    replace: 'SERVER_ID = 0 ,'
+    regexp: 'SERVER_ID\s.*,'
+    replace: 'SERVER_ID     = 0,'
   when:
     - ansible_hostname == "openmaster"
-  tags: [Set_SERVER_ID]
+  tags: [Set_SERVER_ID_openmaster]
 
 - name: Start Opennebula Service
   service:
@@ -41,6 +41,12 @@
     - ansible_hostname == "openmaster"
   tags: [Backup_oned_database]
 
+- name: chown .one directory
+  shell: chown -R oneadmin. /var/lib/one/.one
+  when:
+    - ansible_hostname == "openslave"
+  tags: [chown_.one]
+
 
 - name: Stop Opennebula Service on openslave
   service:
@@ -63,7 +69,7 @@
   replace:
     dest: /etc/one/oned.conf
     regexp: 'SERVER_ID\s.*,'
-    replace: 'SERVER_ID = 1,'
+    replace: 'SERVER_ID     = 1,'
   when:
     - ansible_hostname == "openslave"
   tags: [Set_SERVER_ID_openslave]
@@ -79,9 +85,57 @@
     - ansible_hostname == "openslave"
   tags: [Start_Opennebulaslave_Service]
 
-- name: Add slave to Master
-  command: onezone server-add 0 --name openslave --rpc http://{{ipv4.address}}:2633/RPC2
+
+- name: Add port to firewalld
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  with_items:
+    - 2633/tcp
+  when:
+    - ansible_hostname == "openmaster"
+  tags: [addport_to_firewalld]
+
+- name: reload service firewalld
+  systemd:
+    name: firewalld
+    state: reloaded
+  when:
+    - ansible_hostname == "openmaster"
+  tags: [reload_firewalld]
+
+
+- name: Add port to firewalld
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  with_items:
+    - 2633/tcp
   when:
     - ansible_hostname == "openslave"
-  tags: [Add_slave_to_master]
+  tags: [addport_to_firewalld]
+
+- name: reload service firewalld
+  systemd:
+    name: firewalld
+    state: reloaded
+  when:
+    - ansible_hostname == "openslave"
+  tags: [reload_firewalld]
+
+
+- name: Add Master to Zone
+  command: onezone server-add 0 --name openmaster --rpc http://openmaster:2633/RPC2
+  when:
+    - ansible_hostname == "openmaster"
+  tags: [Add_Master_To_Zone]
+
+ 
+- name: Add Slave to Zone
+  command: onezone server-add 0 --name openslave --rpc http://openslave:2633/RPC2
+  when:
+    - ansible_hostname == "openmaster"
+  tags: [Add_Slave_To_Zone]
 

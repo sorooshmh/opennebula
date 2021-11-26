@@ -10,7 +10,7 @@
   yum_repository:
         name: opennebula
         description: opennebula
-        baseurl: https://downloads.opennebula.org/repo/6.1/CentOS/7/x86_64
+        baseurl: https://downloads.opennebula.io/repo/6.2.0/CentOS/7/x86_64/
         gpgcheck: yes
         enabled: yes
         gpgkey: https://downloads.opennebula.org/repo/repo.key

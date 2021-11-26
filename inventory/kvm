@@ -1,3 +1,5 @@
-[kvm-servers]
-192.168.56.125
+[opennebula-servers]
+openmaster
 
+[kvm-servers]
+kvm
