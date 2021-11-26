@@ -1,0 +1,48 @@
+- name: install needed network manager libs
+  yum: 
+    name: "{{ item }}" 
+    state: installed
+  with_items:
+      - NetworkManager-glib
+      - python-gobject
+      - policycoreutils-python
+  tags: [install_dependencies]
+
+- name: Add Bond
+  nmcli:
+     type: bond
+     conn_name: bond0
+     ip4: "{{ bond0_ip }}"
+     gw4: "{{bond0_gw }}"
+     mode: 'active-backup'
+     state: present
+  tags: [Add_bond]
+
+- name: Add Bond
+  nmcli:
+     type: bond
+     conn_name: bond1
+     ip4: "{{ bond1_ip }}"
+     gw4: "{{bond1_gw}}"
+     mode: 'active-backup'
+     state: present
+  tags: [Add_bond]
+
+
+- name: try nmcli add bond-slave
+  shell: nmcli con add type bond-slave ifname ens34 master bond0
+  tags: [Add_bond-slave]
+
+- name: try nmcli add bond-slave
+  shell: nmcli con add type bond-slave ifname ens35 master bond0
+  tags: [Add_bond-slave]
+
+- name: try nmcli add bond-slave
+  shell: nmcli con add type bond-slave ifname ens36 master bond1
+  tags: [Add_bond-slave]
+
+- name: try nmcli add bond-slave
+  shell: nmcli con add type bond-slave ifname ens37 master bond1
+  tags: [Add_bond-slave]
+
+
