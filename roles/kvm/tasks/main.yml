@@ -18,6 +18,34 @@
     - ansible_hostname == "kvm"
   tags: [opennebula_install]
 
+
+- name: install required dependencies
+  yum: 
+    name: "{{ item }}" 
+    state: installed
+  with_items:
+    - qemu-kvm
+    - qemu-img
+    - virt-manager
+    - libvirt
+    - libvirt-python
+    - libvirt-client
+    - virt-install
+    - virt-viewer
+    - bridge-utils
+    - sshpass
+  tags: [install_dependencies]
+
+- name: Enable and start kvm services
+  service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+  with_items:
+    - libvirtd
+  tags: [start_enable_kvm]
+
+
 - name: Install libselinux-python (required by ansible to manage selinux)
   yum:
     name: libselinux-python
