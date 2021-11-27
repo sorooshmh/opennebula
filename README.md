@@ -48,19 +48,22 @@ This playbook use to bond NICs and put them in 2 groups( bond0 and bond1).Put yo
 **opennebula:**
 
 This playbook can create 2 opennebula servers at the same time
-         ansible-playbook opennebula.yaml -i inventory/opennebula -vv
+    
+    ansible-playbook opennebula.yaml -i inventory/opennebula -vv
          
          
 **open-ha:**
 
 This playbook can create a HA environment.
-          ansible-playbook open-ha.yml -i inventory/open-ha -vv
+      
+      ansible-playbook open-ha.yml -i inventory/open-ha -vv
          
          
 **kvm:**
 
 This playbook can create a KVM virtualization and add this host to opennebula.
-          ansible-playbook kvm.yml -i inventory/kvm -vv
+        
+        ansible-playbook kvm.yml -i inventory/kvm -vv
           
           
 **Usage:**
