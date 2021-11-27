@@ -1,4 +1,4 @@
-**Deploying OpenNebula on 2 Servers in HA mode:
+**Deploying OpenNebula on 2 Servers in HA mode:**
 
 This playbook install opennebula on 2 servers which are in HA modes.It means one server is in master mode and another in slave mode and follow the master.
 
