@@ -1,5 +1,5 @@
 - name: create template 
-  shell: onetemplate create --name test-vm --memory 128 --cpu 1 --disk "Arch Linux" --nic Public
+  shell: onetemplate create --name test-vm --memory 128 --cpu 1 --nic Public
   when:
     - ansible_hostname == "openmaster"
   tags: [create_template]
