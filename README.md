@@ -30,7 +30,7 @@ mv opnenebula/* /home/ansible/provision
 **Describe playbooks:**
 
 bond.yaml:
-This playbook use to bond NICs and put them in 2 groups( bond0 and bond1).Put your desired IPs in ansible-playbook command and excute it.
+This playbook use to bond NICs and put them in 2 groups( bond0 and bond1).Put your desired IPs in ansible-playbook command and execute it.
 
       ansible-playbook bond.yml -i inventory/bond --tags=Add_bond -e '{ "bond0_ip": "192.168.180.11"}' -e '{ "bond1_ip": "192.168.190.11"}' -e '{ "bond0_gw": "192.168.180.1"}' -e '{ "bond1_gw": "192.168.190.1"}'
       
