@@ -70,6 +70,14 @@ This playbook can create a KVM virtualization and add this host to opennebula.
 
       ansible-playbook kvm.yml -i inventory/kvm -vv
     
+ 
+ **virtualmachine:**
+ This Playbook create a VM machines from a template.
+ 
+      
+      ansible-playbook virtualmachine.yaml -i inventory/virtualmachine -vv
+ 
+    
     
 **Usage:**
 
