@@ -1,5 +1,14 @@
-- name: create template 
-  shell: onetemplate create --name test-vm --memory 128 --cpu 1 --nic Public
+- name: Create a image to opennebula
+  shell: oneimage create --datastore default --name centos --path http://mirror.earthlink.iq/centos/7.9.2009/isos/x86_64/CentOS-7-x86_64-Minimal-2009.iso   --description "Centos image"
+  tags: [download_centos_image]
+
+
+- name: create template
+  shell: onetemplate create --name centos --memory 128 --cpu 1 --disk "centos" --nic Public
   when:
     - ansible_hostname == "openmaster"
   tags: [create_template]
+
+- name: Create New VM from Template
+  shell:  onevm create centos
+  tags: [Create_New_VM]
