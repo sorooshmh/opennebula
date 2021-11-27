@@ -78,7 +78,7 @@
   tags: [passwordless_ssh]
 
 - name: Send to kvm server
-  command: su oneadmin -l -c 'sshpass -p "Bb@123" ssh-copy-id oneadmin@kvm'
+  command: su oneadmin -l -c 'sshpass -p "{{oneadmin_pass}}" ssh-copy-id oneadmin@kvm'
   when:
      - ansible_hostname == "openmaster"
   tags: [passwordless_ssh]

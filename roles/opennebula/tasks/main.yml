@@ -1,9 +1,3 @@
-#- name: check 
-#  shell: df -h
-# when: 
-#    - (ansible_hostname == "openslave")
-#  tags: [test]
-
 - name: Install epel yum repository
   yum: 
     name: epel-release 
@@ -82,7 +76,7 @@
   tags: [mariadb_root_pass]
 
 - name: sql query
-  command: mysql -u root --execute="ALTER USER 'root'@'localhost' IDENTIFIED BY 'root@123';"
+  command: mysql -u root --execute="ALTER USER 'root'@'localhost' IDENTIFIED BY '{{sql_rootpassword}}';"
   tags: [change_mariadb_pass]
 
 - name: Stop MySQL
@@ -113,11 +107,11 @@
 - name: Set mysql user privileges
   mysql_user:
     login_user: root
-    login_password: root@123
+    login_password: "{{sql_rootpassword}}"
     login_host: localhost
     name: oneadmin
     priv: "opennebula.*:ALL"
-    password: "Aa@123"
+    password: "{{opennebula_user_mysql_password}}"
     host: localhost
     state: present
   tags: [set_mysql_privileges]
@@ -181,12 +175,12 @@
     dest: /etc/one/oned.conf
     after: '# Sample configuration for MySQL'
     before: ']'
-    regexp: '^PASSWD =\s(.*)$'
+    regexp: '^PASSWD=\s.*,$'
     replace: 'PASSWD = "Aa@123",'
   tags: [setpassword_mysql_oned]
 
 - name: Set Password to oneadmin user
-  shell: echo "oneadmin:Bb@123" > /var/lib/one/.one/one_auth
+  shell: echo "oneadmin:"{{oneadmin_pass}}"" > /var/lib/one/.one/one_auth
   tags: [setpassword_oned]
 
 - name: Add port to firewalld

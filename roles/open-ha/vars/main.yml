@@ -1,3 +1,4 @@
 oneadmin_pass: Bb@1234
 opennebula_user_mysql_password: Aa@123
 sql_rootpassword: root@123
+os_root_pass: qazwsx

@@ -33,10 +33,10 @@
 - name: Backup onedb backup
   shell: "{{item}}"
   with_items:
-    - onedb backup -u oneadmin -p "Aa@123" -d opennebula
-    - sshpass -p "qazwsx" scp -oStrictHostKeyChecking=no /var/lib/one/mysql_localhost_opennebula_*.sql openslave:/tmp
-    - sshpass -p "qazwsx" ssh openslave rm -rf /var/lib/one/.one
-    - sshpass -p "qazwsx" scp -r /var/lib/one/.one/ openslave:/var/lib/one/
+    - onedb backup -u oneadmin -p "{{opennebula_user_mysql_password}}" -d opennebula
+    - sshpass -p "{{os_root_pass}}" scp -oStrictHostKeyChecking=no /var/lib/one/mysql_localhost_opennebula_*.sql openslave:/tmp
+    - sshpass -p "{{os_root_pass}}" ssh openslave rm -rf /var/lib/one/.one
+    - sshpass -p "{{os_root_pass}}" scp -r /var/lib/one/.one/ openslave:/var/lib/one/
   when:
     - ansible_hostname == "openmaster"
   tags: [Backup_oned_database]
@@ -60,7 +60,7 @@
   tags: [Stop_Opennebulaslave_Service]
 
 - name: Restore onedb backup
-  shell: onedb restore -f -u oneadmin -p "Aa@123" -d opennebula /tmp/mysql_localhost_opennebula_*.sql
+  shell: onedb restore -f -u oneadmin -p "{{opennebula_user_mysql_password}}" -d opennebula /tmp/mysql_localhost_opennebula_*.sql
   when:
     - ansible_hostname == "openslave"
   tags: [Restore_onedb_openslave]
