@@ -4,17 +4,4 @@ bond1_ip : "{{ bond1_ip }}"
 bond1_gw : "{{ bond1_gw }}"
 
 
-nmcli_bond_slave:
-        conn_name: 'ens34'
-        ifname: 'ens34'
-        master: 'bond0'
-        conn_name: 'ens35'
-        ifname: 'ens35'
-        master: 'bond0'
-        conn_name: 'ens36'
-        ifname: 'ens36'
-        master: 'bond1'
-        conn_name: 'ens37'
-        ifname: 'ens37'
-        master: 'bond1'
 
