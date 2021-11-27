@@ -17,8 +17,11 @@ Vmware workstation for test scenario
 **Before Any Installation:**
 
 You should set hostname for each machines for example one machine openmaster and another openslave.
+
 Set IPs and hostnames on /etc/hosts if you don't have any dns server in your environment.
+
 On each opennebula servers you should set 4 NICs which will bond each other in related playbook.
+
 You need an ansible server that can communicate with the other machines in order to excute the playbooks.
 
 
