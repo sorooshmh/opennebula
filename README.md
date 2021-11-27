@@ -5,10 +5,10 @@ This playbook install opennebula on 2 servers which are in HA modes.It means one
 
 **Requirements**
 
-2 servers( centos7) for opennebulas
-1 server ( centos7) for kvm machine
-1 server ansible machine
-Vmware workstation for test scenario
+*2 servers( centos7) for opennebulas
+*1 server ( centos7) for kvm machine
+*1 server ansible machine
+*Vmware workstation for test scenario
 
 
 **Before Any Installation:**
