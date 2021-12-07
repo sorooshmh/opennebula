@@ -73,6 +73,12 @@ This playbook can create a KVM virtualization and add this host to opennebula.
 
 
       ansible-playbook kvm.yml -i inventory/kvm -vv
+      
+ You can test your kvm hosts with below command:
+ 
+      virt-manager
+      
+ If your Os is Windows, you need install Xming and after that from consol execute above command (you should enable X11 forwarding before execute command)
     
  
  **virtualmachine:**
