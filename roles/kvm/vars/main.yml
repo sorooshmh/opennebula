@@ -1,3 +1,4 @@
-oneadmin_pass: Bb@1234
+oneadmin_hash_password: $6$PkAga8V5INBl9A5S$fNpSM7FN96F7HGV8G/6/sM2Hkb5NAGsVE47Dvl/RvdWyiN5/PjFHtYg0rw58FzicqmdOT3AoftnGV.l7hrn011
+oneadmin_user_password: Bb@1234
 opennebula_user_mysql_password: Aa@123
 sql_rootpassword: root@123
