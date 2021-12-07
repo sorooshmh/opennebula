@@ -69,6 +69,29 @@
     - ansible_hostname == "kvm"
   tags: [install_dependencies]
 
+- name: Set Password to oneadmin in master
+  user:
+    name: oneadmin
+    password: "{{oneadmin_hash_password}}"
+    shell: /bin/bash
+    groups: root
+  become: yes
+  become_method: sudo
+  when:
+     - ansible_hostname == "openmaster"
+  tags: [Set_password_to_oneadmin]
+
+- name: Set Password to oneadmin in kvm
+  user:
+    name: oneadmin
+    password: "{{oneadmin_hash_password}}"
+    shell: /bin/bash
+    groups: root
+  become: yes
+  become_method: sudo
+  when:
+     - ansible_hostname == "kvm"
+  tags: [Set_password_to_oneadmin]
 
 - name: Create ssh-keyscan
   command: su oneadmin -l -c 'ssh-keyscan openmaster kvm >> /var/lib/one/.ssh/known_hosts'
@@ -78,7 +101,7 @@
   tags: [passwordless_ssh]
 
 - name: Send to kvm server
-  command: su oneadmin -l -c 'sshpass -p "{{oneadmin_pass}}" ssh-copy-id oneadmin@kvm'
+  command: su oneadmin -l -c 'sshpass -p "{{oneadmin_user_password}}" ssh-copy-id oneadmin@kvm'
   when:
      - ansible_hostname == "openmaster"
   tags: [passwordless_ssh]
@@ -89,4 +112,3 @@
   when:
      - ansible_hostname == "openmaster"
   tags: [Add_KVM_Host]
-
