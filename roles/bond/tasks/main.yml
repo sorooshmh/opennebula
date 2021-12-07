@@ -28,21 +28,44 @@
      state: present
   tags: [Add_bond]
 
-
-- name: try nmcli add bond-slave
-  shell: nmcli con add type bond-slave ifname ens34 master bond0
-  tags: [Add_bond-slave]
-
 - name: try nmcli add bond-slave
   shell: nmcli con add type bond-slave ifname ens35 master bond0
   tags: [Add_bond-slave]
 
 - name: try nmcli add bond-slave
-  shell: nmcli con add type bond-slave ifname ens36 master bond1
+  shell: nmcli con add type bond-slave ifname ens36 master bond0
   tags: [Add_bond-slave]
 
 - name: try nmcli add bond-slave
   shell: nmcli con add type bond-slave ifname ens37 master bond1
   tags: [Add_bond-slave]
 
+- name: try nmcli add bond-slave
+  shell: nmcli con add type bond-slave ifname ens38 master bond1
+  tags: [Add_bond-slave]
+
+
+- name: Activating Slaves bond
+  shell: nmcli connection up bond-slave-ens35
+  tags: [Activate_Slaves]
+
+- name: Activating Slaves bond
+  shell: nmcli connection up bond-slave-ens36
+  tags: [Activate_Slaves]
+
+- name: Activating Slaves bond
+  shell: nmcli connection up bond-slave-ens37
+  tags: [Activate_Slaves]
+
+- name: Activating Slaves bond
+  shell: nmcli connection up bond-slave-ens38
+  tags: [Activate_Slaves]
+
+
+- name: Activating Bond
+  shell: nmcli con up "{{item}}"
+  with_items:
+  - bond0
+  - bond1
+  tags: [Activate_Bond]
 
