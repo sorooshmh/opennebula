@@ -62,7 +62,11 @@ This playbook can create a HA environment.
 
       ansible-playbook open-ha.yml -i inventory/open-ha -vv
   
-  
+**NOTE:** You can see the openha environment by the below command:
+
+      onezone show 0
+ 
+ 
 **kvm:**
 
 This playbook can create a KVM virtualization and add this host to opennebula.
