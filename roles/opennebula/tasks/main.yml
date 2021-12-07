@@ -25,7 +25,6 @@
   tags: [mariadb_install]
 
 
-
 - name: Install libselinux-python (required by ansible to manage selinux)
   yum: 
     name: libselinux-python 
@@ -49,7 +48,6 @@
     - vim
     - sshpass
   tags: [install_dependencies]
-
 
 - name: Enable and start Maridb services
   service:
@@ -75,10 +73,6 @@
         state: started
   tags: [mariadb_root_pass]
 
-- name: sql query
-  command: mysql -u root --execute="ALTER USER 'root'@'localhost' IDENTIFIED BY '{{sql_rootpassword}}';"
-  tags: [change_mariadb_pass]
-
 - name: Stop MySQL
   service: 
      name: mariadb 
@@ -95,10 +89,14 @@
     state: started
   tags: [mariadb_root_pass]
 
+- name: sql query
+  command: mysql -u root --execute="ALTER USER 'root'@'localhost' IDENTIFIED BY '{{sql_rootpassword}}';"
+  tags: [change_mariadb_pass]
+
 - name: Create a mysql DB
   mysql_db:
         login_user: root
-        login_password: root@123
+        login_password: "{{sql_rootpassword}}"
         login_host: localhost
         name: opennebula
         state: present
@@ -132,25 +130,17 @@
     - opennebula-common
   tags: [install_opennebula]
 
-- name: Comment sqlite
+- name: Comment sqlite line in oned
   replace:
         dest: /etc/one/oned.conf
-        after: '# Sample configuration for MySQL'
+        after: 'SCRIPTS_REMOTE_DIR=/var/tmp/one'
         before: ']'
-        regexp: '^#?\s*{{ item.key }}\s'
-        replace: "{{ item.key }}"
+        regexp: '.*{{ item.key }}\s'
+        replace: "#{{ item.key }}"
   with_items:
   - key: DB
-  - key: SERVER
-  - key: PORT
-  - key: USER
-  - key: PASSWD
-  - key: DB_NAME
-  - key: CONNECTIONS
-  - key: COMPARE_BINARY
-  tags: [uncomment_mysqlline_in_oned]
-
-
+  - key: TIMEOUT
+  tags: [comment_sqlite_in_oned]
 
 - name: Uncomment mysql line in oned
   replace:
@@ -175,7 +165,7 @@
     dest: /etc/one/oned.conf
     after: '# Sample configuration for MySQL'
     before: ']'
-    regexp: '^PASSWD=\s.*,$'
+    regexp: '^PASSWD\s=\s.*,$'
     replace: 'PASSWD = "Aa@123",'
   tags: [setpassword_mysql_oned]
 
@@ -207,37 +197,3 @@
     - opennebula
     - opennebula-sunstone
   tags: [start_enable_opennebula]
-
-- name: change password
-  ansible.builtin.user:
-    name: "oneadmin"
-    state: present
-    password: "{{oneadmin_pass}}"
-    update_password: always
-  tags: [set_password] 
-
-- name: Create ssh-keyscan
-  command: su oneadmin -l -c 'ssh-keyscan openmaster openslave >> /var/lib/one/.ssh/known_hosts'
-  become_exe: sudo
-  when:
-     - ansible_hostname == "openmaster"
-  tags: [passwordless_ssh]
-
-- name: send sshkey from master to slave
-  command: su oneadmin -l -c 'sshpass -p "Bb@123" ssh-copy-id oneadmin@openslave'
-  when:
-     - ansible_hostname == "openmaster"
-  tags: [send_ssh_key_to_slave]
-
-
-- name: send sshkey from slave to master
-  command: su oneadmin -l -c 'sshpass -p "Bb@123" ssh-copy-id oneadmin@openmaster'
-  when:
-     - ansible_hostname == "openslave"
-  tags: [send_ssh_key_to_master]
-
-
-
-
-
-
