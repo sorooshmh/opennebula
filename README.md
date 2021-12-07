@@ -41,10 +41,10 @@ mv opnenebula/* /home/ansible/provision
 This playbook use to bond NICs and put them in 2 groups( bond0 and bond1).Put your desired IPs in ansible-playbook command and execute it.These playbooks should execute on each machines separately to create bond NICs and slave-bond from each interface.
 
 
-       ansible-playbook bond.yml -i inventory/bond -l openmaster --tags=Add_bond -e '{ "bond0_ip": "192.168.180.10"}' -e '{ "bond1_ip": "192.168.190.10"}' -e '{ "bond0_gw":     "192.168.180.1"}' -e '{ "bond1_gw": "192.168.190.1"}'
+       ansible-playbook bond.yml -i inventory/bond -l openmaster  -e '{ "bond0_ip": "192.168.180.10"}' -e '{ "bond1_ip": "192.168.190.10"}' -e '{ "bond0_gw":     "192.168.180.1"}' -e '{ "bond1_gw": "192.168.190.1"}'
        
 
-       ansible-playbook bond.yml -i inventory/bond  -l openslave --tags=Add_bond -e '{ "bond0_ip": "192.168.180.11"}' -e '{ "bond1_ip": "192.168.190.11"}' -e '{ "bond0_gw": "192.168.180.1"}' -e '{ "bond1_gw": "192.168.190.1"}'
+       ansible-playbook bond.yml -i inventory/bond  -l openslave  -e '{ "bond0_ip": "192.168.180.11"}' -e '{ "bond1_ip": "192.168.190.11"}' -e '{ "bond0_gw": "192.168.180.1"}' -e '{ "bond1_gw": "192.168.190.1"}'
   
   
 **opennebula:**
