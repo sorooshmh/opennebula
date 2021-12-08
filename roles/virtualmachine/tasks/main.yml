@@ -1,14 +1,46 @@
-- name: Create a image to opennebula
-  shell: oneimage create --datastore default --name centos --path http://mirror.earthlink.iq/centos/7.9.2009/isos/x86_64/CentOS-7-x86_64-Minimal-2009.iso   --description "Centos image"
-  tags: [download_centos_image]
+- name: Copy VLAN180
+  copy:
+    src: vlan180.txt
+    dest: /root
+  tags: [Copy_vlan180]
 
+- name: Copy VLAN201
+  copy:
+    src: vlan201.txt
+    dest: /root
+  tags: [Copy_vlan180]
 
-- name: create template
-  shell: onetemplate create --name centos --memory 128 --cpu 1 --disk "centos" --nic Public
-  when:
-    - ansible_hostname == "openmaster"
-  tags: [create_template]
+- name: Create Virtual Network
+  shell: onevnet create "{{ item }}"
+  args:
+    chdir: /root
+  with_items:
+    - vlan180.txt
+    - vlan201.txt
+  tags: [Create_VirtualNetworks]
 
-- name: Create New VM from Template
-  shell:  onevm create centos
-  tags: [Create_New_VM]
+- name: Copy Os To Master
+  copy:
+    src: CentOS-7-x86_64-Minimal-2009.iso
+    dest: /var/tmp/
+    mode: 0755
+    owner: oneadmin
+    group: oneadmin
+  tags: [Copy_Os_To_Master]
+
+- name: Create Image
+  shell: oneimage create -d default --name centos --path /var/tmp/CentOS-7-x86_64-Minimal-2009.iso --prefix sd --type OS --description "Centos Os Installation"
+  tags: [Create_Image]
+
+- name: Copy vm-template to Master
+  copy:
+    src: vm-template
+    dest: /root
+  tags: [Copy_vm-template]
+
+- name: Create Vm from template
+  shell: onevm create vm-template
+  args:
+    chdir: /root
+  tags: [Create_Vm]
+
