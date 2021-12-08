@@ -65,7 +65,7 @@ This playbook can create a HA environment.
 **NOTE:** You can see the openha environment by the below command:
 
       onezone show 0
- 
+      onehost list
  
 **kvm:**
 
@@ -82,12 +82,18 @@ This playbook can create a KVM virtualization and add this host to opennebula.
     
  
  **virtualmachine:**
- This Playbook create a VM machine from a template.
+ This Playbook create a VM machine from a template.First of all some are prepared network template and image copy to master server and after that they execute on master server.
  
       
       ansible-playbook virtualmachine.yaml -i inventory/virtualmachine -vv
  
-    
+ 
+ You can also check your environment with these commands:
+ 
+       oneimage list
+       onevm list
+       onevnet list
+ 
     
 **Usage:**
 
