@@ -84,8 +84,13 @@ This playbook can create a KVM virtualization and add this host to opennebula.
  **virtualmachine:**
  This Playbook create a VM machine from a template.First of all some are prepared network template and image copy to master server and after that they execute on master server.
  
+ NOTE: You should download and put your CentOS-7-x86_64-Minimal-2009.iso file into files section in Ansible ( roles>>virtualmachine>>files) 
+ 
       
       ansible-playbook virtualmachine.yaml -i inventory/virtualmachine -vv
+ 
+ 
+ 
  
  
  You can also check your environment with these commands:
