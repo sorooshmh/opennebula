@@ -1,1 +1,15 @@
-###
+NAME    = "VLAN180"
+VN_MAD  = "802.1Q"
+PHYDEV  = "bond0"
+VLAN_ID = "180"
+
+AR=[
+    TYPE = "IP4",
+    IP   = "192.168.180.20",
+    SIZE = "51"
+]
+
+DNS     = "8.8.8.8"
+GATEWAY = "192.168.180.1"
+
+DESCRIPTION = "VLAN180"
