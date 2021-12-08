@@ -1,0 +1,15 @@
+NAME    = "VLAN201"
+VN_MAD  = "802.1Q"
+PHYDEV  = "bond1"
+VLAN_ID = "201"
+
+AR=[
+    TYPE = "IP4",
+    IP   = "192.168.190.20",
+    SIZE = "51"
+]
+
+DNS     = "8.8.8.8"
+GATEWAY = "192.168.190.1"
+
+DESCRIPTION = "VLAN201"
